@@ -7,7 +7,7 @@ const AdminDashboard = ({ onBack }) => {
   const [records, setRecords] = useState([]);
   const [collaborators, setCollaborators] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [dailySummary, setDailySummary] = useState({ present: 0, sick: 0, psg: 0, absent: 0, unjustified: 0, exit: 0 }); // Añadir 'exit'
+  const [dailySummary, setDailySummary] = useState({ present: 0, sick: 0, psg: 0, absent: 0, unjustified: 0, exit: 0 });
   const [lastFiveRecords, setLastFiveRecords] = useState([]);
   const [unregisteredCollaborators, setUnregisteredCollaborators] = useState([]);
   const [groupCounts, setGroupCounts] = useState({});
@@ -28,7 +28,7 @@ const AdminDashboard = ({ onBack }) => {
     const sickCount = todayRecords.filter(r => r.status === 'sick').length;
     const psgCount = todayRecords.filter(r => r.status === 'psg').length;
     const absentCount = todayRecords.filter(r => r.status === 'absent').length;
-    const exitCount = todayRecords.filter(r => r.status === 'exit').length; // Contar salidas
+    const exitCount = todayRecords.filter(r => r.status === 'exit').length;
 
     // Colaboradores que SÍ registraron entrada hoy
     const registeredEmailsToday = new Set(todayRecords.filter(r => r.type === 'entry').map(r => r.email));
@@ -45,7 +45,7 @@ const AdminDashboard = ({ onBack }) => {
       psg: psgCount,
       absent: absentCount,
       unjustified: unjustifiedAbsenceCount,
-      exit: exitCount // Añadir al resumen
+      exit: exitCount
     });
 
     const sortedRecords = [...storedRecords].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -79,7 +79,7 @@ const AdminDashboard = ({ onBack }) => {
       case 'sick': return 'Falta por salud';
       case 'psg': return 'Permiso sin goce';
       case 'absent': return 'Falta injustificada';
-      case 'exit': return 'Salida'; // Nuevo estado
+      case 'exit': return 'Salida';
       default: return status;
     }
   };
@@ -90,7 +90,7 @@ const AdminDashboard = ({ onBack }) => {
       case 'sick': return 'bg-yellow-100 text-yellow-800';
       case 'psg': return 'bg-blue-100 text-blue-800';
       case 'absent': return 'bg-red-100 text-red-800';
-      case 'exit': return 'bg-purple-100 text-purple-800'; // Nuevo color
+      case 'exit': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -99,7 +99,7 @@ const AdminDashboard = ({ onBack }) => {
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Dashboard de Asistencia</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8"> {/* Ajustado a 6 columnas */}
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
         <div className="bg-blue-50 p-4 rounded-lg shadow-sm text-center">
           <h3 className="text-gray-600 text-sm font-medium">Presentes</h3>
           <p className="text-3xl font-bold text-green-700">{dailySummary.present}</p>
@@ -122,7 +122,7 @@ const AdminDashboard = ({ onBack }) => {
         </div>
         <div className="bg-blue-50 p-4 rounded-lg shadow-sm text-center">
           <h3 className="text-gray-600 text-sm font-medium">Salidas</h3>
-          <p className="text-3xl font-bold text-purple-700">{dailySummary.exit}</p> {/* Nuevo contador */}
+          <p className="text-3xl font-bold text-purple-700">{dailySummary.exit}</p>
         </div>
       </div>
 
@@ -177,7 +177,7 @@ const AdminDashboard = ({ onBack }) => {
               <option value="sick">Salud</option>
               <option value="psg">PSG</option>
               <option value="absent">Faltas Registradas</option>
-              <option value="exit">Salidas</option> {/* Nuevo filtro */}
+              <option value="exit">Salidas</option>
             </select>
             <select
               value={groupFilter}
@@ -200,7 +200,7 @@ const AdminDashboard = ({ onBack }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo/Tipo</th> {/* Columna combinada */}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo/Tipo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
               </tr>
             </thead>
@@ -223,7 +223,7 @@ const AdminDashboard = ({ onBack }) => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {record.type === 'exit' ? record.reason : record.type} {/* Mostrar motivo o tipo */}
+                      {record.type === 'exit' ? record.reason : record.type === 'entry' ? record.status : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(record.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -232,7 +232,7 @@ const AdminDashboard = ({ onBack }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500"> {/* Ajustado colSpan */}
+                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                     No hay registros para esta fecha o filtros seleccionados.
                   </td>
                 </tr>
@@ -294,7 +294,7 @@ const AdminDashboard = ({ onBack }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo/Tipo</th> {/* Columna combinada */}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo/Tipo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha y Hora</th>
               </tr>
             </thead>
@@ -319,7 +319,7 @@ const AdminDashboard = ({ onBack }) => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {record.type === 'exit' ? record.reason : record.type}
+                        {record.type === 'exit' ? record.reason : record.type === 'entry' ? record.status : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(record.timestamp).toLocaleString()}
@@ -329,7 +329,7 @@ const AdminDashboard = ({ onBack }) => {
                 })
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500"> {/* Ajustado colSpan */}
+                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                     No hay registros recientes.
                   </td>
                 </tr>

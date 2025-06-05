@@ -7,9 +7,9 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
   const [submitted, setSubmitted] = useState(false);
   const [recentRecords, setRecentRecords] = useState([]);
   const [collaboratorName, setCollaboratorName] = useState('Colaborador');
-  const [hasRegisteredToday, setHasRegisteredToday] = useState(false); // Nuevo estado para saber si ya registró entrada
-  const [exitReason, setExitReason] = useState(''); // Nuevo estado para el motivo de salida
-  const [exitSubmitted, setExitSubmitted] = useState(false); // Nuevo estado para confirmar salida
+  const [hasRegisteredToday, setHasRegisteredToday] = useState(false);
+  const [exitReason, setExitReason] = useState('');
+  const [exitSubmitted, setExitSubmitted] = useState(false);
 
   // Cargar grupos y registros recientes del colaborador y su nombre
   useEffect(() => {
@@ -35,7 +35,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
     );
     setHasRegisteredToday(!!todayEntryRecord);
 
-  }, [userEmail, submitted, exitSubmitted]); // Recargar cuando se envía un nuevo registro o salida
+  }, [userEmail, submitted, exitSubmitted]);
 
   const handleSubmitEntry = (e) => {
     e.preventDefault();
@@ -54,7 +54,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
       status: attendanceStatus,
       group: selectedGroup,
       timestamp: new Date().toISOString(),
-      type: 'entry' // Tipo de registro: entrada
+      type: 'entry'
     };
     
     const allRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
@@ -77,10 +77,10 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
     const record = {
       email: userEmail,
       date: new Date().toISOString().split('T')[0],
-      status: 'exit', // Estado de salida
-      reason: exitReason, // Motivo de salida
+      status: 'exit',
+      reason: exitReason,
       timestamp: new Date().toISOString(),
-      type: 'exit' // Tipo de registro: salida
+      type: 'exit'
     };
 
     const allRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
@@ -98,7 +98,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
       case 'sick': return 'Falta por salud';
       case 'psg': return 'Permiso sin goce';
       case 'absent': return 'Falta injustificada';
-      case 'exit': return 'Salida'; // Nuevo estado
+      case 'exit': return 'Salida';
       default: return status;
     }
   };
@@ -109,7 +109,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
       case 'sick': return 'text-yellow-600';
       case 'psg': return 'text-blue-600';
       case 'absent': return 'text-red-600';
-      case 'exit': return 'text-purple-600'; // Nuevo color
+      case 'exit': return 'text-purple-600';
       default: return 'text-gray-600';
     }
   };

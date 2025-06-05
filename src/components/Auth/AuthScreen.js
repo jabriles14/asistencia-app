@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import Logo from '../Logo'; // Importar el componente Logo
+import Logo from '../Logo';
 
 const AuthScreen = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // Cambiado de email a identifier
   const [role, setRole] = useState('');
-  const [password, setPassword] = useState(''); // Para la contraseña del admin
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError(''); // Limpiar errores previos
+    setError('');
 
-    if (!email) {
-      setError('Por favor, ingresa tu correo electrónico.');
+    if (!identifier) {
+      setError('Por favor, ingresa tu código o correo electrónico.');
       return;
     }
 
@@ -21,26 +21,18 @@ const AuthScreen = ({ onLogin }) => {
       return;
     }
 
-    // Validación de correo Gmail
-    if (!email.endsWith('@gmail.com')) {
-      setError('Solo se permiten correos de Gmail.');
-      return;
-    }
-
-    // Validación específica para administrador
+    // Validación para administradores
     if (role === 'admin') {
       // Contraseñas fijas (para el administrador principal)
       if (password === 'abriles320580') {
-        // Este es el super-admin, tiene todos los permisos por defecto
-        onLogin(email, {
+        onLogin(identifier, {
           role: 'admin_full',
           canManageCollaborators: true,
           canManageGroups: true
         });
         return;
       } else if (password === 'calidadh2o') {
-        // Este es el admin de reportes fijo, sin gestión
-        onLogin(email, {
+        onLogin(identifier, {
           role: 'admin_reports',
           canManageCollaborators: false,
           canManageGroups: false
@@ -48,13 +40,12 @@ const AuthScreen = ({ onLogin }) => {
         return;
       }
 
-      // Luego, busca en la lista de administradores registrados dinámicamente
+      // Busca en la lista de administradores registrados dinámicamente
       const adminUsers = JSON.parse(localStorage.getItem('adminUsers') || '[]');
-      const foundAdmin = adminUsers.find(user => user.email === email && user.password === password);
+      const foundAdmin = adminUsers.find(user => user.email === identifier && user.password === password);
 
       if (foundAdmin) {
-        // Si se encuentra, usa los permisos definidos para ese usuario
-        onLogin(email, {
+        onLogin(identifier, {
           role: foundAdmin.role,
           canManageCollaborators: foundAdmin.canManageCollaborators,
           canManageGroups: foundAdmin.canManageGroups
@@ -62,31 +53,43 @@ const AuthScreen = ({ onLogin }) => {
       } else {
         setError('Credenciales de administrador incorrectas o no registrado.');
       }
-      return; // Salir después de intentar login de admin
+      return;
     }
 
-    // Si es colaborador, simplemente loguear
-    onLogin(email, { role: 'employee' });
+    // Validación para colaboradores (ahora por código)
+    if (role === 'employee') {
+      const collaborators = JSON.parse(localStorage.getItem('employees') || '[]');
+      const foundCollaborator = collaborators.find(collab => collab.code === identifier); // Busca por código
+
+      if (foundCollaborator) {
+        onLogin(foundCollaborator.email, { role: 'employee' }); // Pasa el email del colaborador encontrado
+      } else {
+        setError('Código de colaborador no válido.');
+      }
+      return;
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <Logo /> {/* Aquí se inserta el logo */}
+          <Logo />
         </div>
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Control de Asistencia</h1>
         
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-2">Correo Gmail</label>
+            <label htmlFor="identifier" className="block text-gray-700 text-sm font-medium mb-2">
+              {role === 'admin' ? 'Correo de Administrador' : 'Código de Colaborador'}
+            </label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type={role === 'admin' ? 'email' : 'text'} // Tipo de input dinámico
+              id="identifier"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              placeholder="tu.correo@gmail.com"
+              placeholder={role === 'admin' ? 'tu.correo@gmail.com' : 'Ingresa tu código'}
               required
             />
           </div>
@@ -96,14 +99,14 @@ const AuthScreen = ({ onLogin }) => {
             <div className="flex space-x-4">
               <button
                 type="button"
-                onClick={() => { setRole('employee'); setPassword(''); }} // Limpiar contraseña si cambia a colaborador
+                onClick={() => { setRole('employee'); setPassword(''); setIdentifier(''); }} // Limpiar al cambiar
                 className={`flex-1 px-4 py-2 rounded-lg transition-all duration-200 ${role === 'employee' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               >
                 Colaborador
               </button>
               <button
                 type="button"
-                onClick={() => setRole('admin')}
+                onClick={() => { setRole('admin'); setIdentifier(''); }} // Limpiar al cambiar
                 className={`flex-1 px-4 py-2 rounded-lg transition-all duration-200 ${role === 'admin' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               >
                 Administrador
@@ -141,6 +144,3 @@ const AuthScreen = ({ onLogin }) => {
 };
 
 export default AuthScreen;
-
-
-// DONE

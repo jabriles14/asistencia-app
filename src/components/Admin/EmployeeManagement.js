@@ -6,12 +6,12 @@ const EmployeeManagement = () => {
     name: '',
     lastName: '',
     email: '',
-    group: '' // Nuevo campo para el grupo del colaborador
+    group: '',
+    code: '' // Nuevo campo para el código del colaborador
   });
-  const [groups, setGroups] = useState([]); // Para cargar los grupos disponibles
+  const [groups, setGroups] = useState([]);
   const [error, setError] = useState('');
 
-  // Cargar colaboradores y grupos al iniciar
   useEffect(() => {
     const savedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
     setCollaborators(savedCollaborators);
@@ -26,7 +26,7 @@ const EmployeeManagement = () => {
 
   const handleAddCollaborator = () => {
     setError('');
-    if (!newCollaborator.name || !newCollaborator.lastName || !newCollaborator.email || !newCollaborator.group) {
+    if (!newCollaborator.name || !newCollaborator.lastName || !newCollaborator.email || !newCollaborator.group || !newCollaborator.code) {
       setError('Todos los campos son obligatorios.');
       return;
     }
@@ -38,6 +38,10 @@ const EmployeeManagement = () => {
       setError('Este correo ya está registrado.');
       return;
     }
+    if (collaborators.some(collab => collab.code === newCollaborator.code)) { // Validar código único
+      setError('Este código ya está en uso.');
+      return;
+    }
     
     const updatedCollaborators = [...collaborators, {
       id: Date.now(),
@@ -47,7 +51,7 @@ const EmployeeManagement = () => {
     
     setCollaborators(updatedCollaborators);
     localStorage.setItem('employees', JSON.stringify(updatedCollaborators));
-    setNewCollaborator({ name: '', lastName: '', email: '', group: '' }); // Limpiar formulario
+    setNewCollaborator({ name: '', lastName: '', email: '', group: '', code: '' }); // Limpiar formulario
   };
 
   const handleDeleteCollaborator = (id) => {
@@ -60,7 +64,7 @@ const EmployeeManagement = () => {
     <div className="p-6 bg-white rounded-xl shadow-lg mt-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Gestión de Colaboradores</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"> {/* Ajustado a 4 columnas */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4"> {/* Ajustado a 5 columnas */}
         <input
           type="text"
           name="name"
@@ -100,6 +104,15 @@ const EmployeeManagement = () => {
             <option key={group.id} value={group.name}>{group.name}</option>
           ))}
         </select>
+        <input
+          type="text"
+          name="code"
+          value={newCollaborator.code}
+          onChange={handleInputChange}
+          placeholder="Código de acceso"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          required
+        />
       </div>
       
       {error && <p className="text-red-600 text-sm mb-4 text-center">{error}</p>}
@@ -117,7 +130,8 @@ const EmployeeManagement = () => {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th> {/* Nueva columna */}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th> {/* Nueva columna */}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
@@ -127,7 +141,8 @@ const EmployeeManagement = () => {
                 <tr key={collaborator.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{collaborator.fullName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{collaborator.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{collaborator.group || 'N/A'}</td> {/* Mostrar grupo */}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{collaborator.group || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{collaborator.code}</td> {/* Mostrar código */}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleDeleteCollaborator(collaborator.id)}
@@ -140,7 +155,7 @@ const EmployeeManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="px-6 py-4 text-center text-gray-500"> {/* Ajustado colSpan */}
+                <td colSpan="5" className="px-6 py-4 text-center text-gray-500"> {/* Ajustado colSpan */}
                   No hay colaboradores registrados.
                 </td>
               </tr>
