@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Logo from '../Logo';
 
 const AuthScreen = ({ onLogin }) => {
-  const [identifier, setIdentifier] = useState('');
-  const [role, setRole] = useState('employee'); // Preseleccionar 'employee' por defecto
+  const [identifier, setIdentifier] = useState(''); // Código de colaborador o correo de admin
+  const [role, setRole] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
-  // Efecto para limpiar el error cuando cambia el rol o el identificador
-  useEffect(() => {
-    setError('');
-  }, [role, identifier]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -104,14 +99,14 @@ const AuthScreen = ({ onLogin }) => {
             <div className="flex space-x-4">
               <button
                 type="button"
-                onClick={() => { setRole('employee'); setPassword(''); setIdentifier(''); }} // Limpiar al cambiar
+                onClick={() => { setRole('employee'); setPassword(''); setIdentifier(''); }}
                 className={`flex-1 px-4 py-2 rounded-lg transition-all duration-200 ${role === 'employee' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               >
                 Colaborador
               </button>
               <button
                 type="button"
-                onClick={() => { setRole('admin'); setIdentifier(''); }} // Limpiar al cambiar
+                onClick={() => { setRole('admin'); setIdentifier(''); }}
                 className={`flex-1 px-4 py-2 rounded-lg transition-all duration-200 ${role === 'admin' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               >
                 Administrador
@@ -144,12 +139,8 @@ const AuthScreen = ({ onLogin }) => {
           </button>
         </form>
       </div>
-      <p className="text-center text-gray-500 text-sm mt-4">Desarrollado por jabriles</p>
     </div>
   );
 };
 
 export default AuthScreen;
-
-
-// DONE
