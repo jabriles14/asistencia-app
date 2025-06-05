@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Logo from '../Logo';
 
 const AuthScreen = ({ onLogin }) => {
-  const [identifier, setIdentifier] = useState(''); // Cambiado de email a identifier
-  const [role, setRole] = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [role, setRole] = useState('employee'); // Preseleccionar 'employee' por defecto
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // Efecto para limpiar el error cuando cambia el rol o el identificador
+  useEffect(() => {
+    setError('');
+  }, [role, identifier]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,13 +61,13 @@ const AuthScreen = ({ onLogin }) => {
       return;
     }
 
-    // Validación para colaboradores (ahora por código)
+    // Validación para colaboradores (ahora solo por código)
     if (role === 'employee') {
       const collaborators = JSON.parse(localStorage.getItem('employees') || '[]');
       const foundCollaborator = collaborators.find(collab => collab.code === identifier); // Busca por código
 
       if (foundCollaborator) {
-        onLogin(foundCollaborator.email, { role: 'employee' }); // Pasa el email del colaborador encontrado
+        onLogin(foundCollaborator.email, { role: 'employee' }); // Pasa el email interno del colaborador encontrado
       } else {
         setError('Código de colaborador no válido.');
       }
@@ -84,7 +89,7 @@ const AuthScreen = ({ onLogin }) => {
               {role === 'admin' ? 'Correo de Administrador' : 'Código de Colaborador'}
             </label>
             <input
-              type={role === 'admin' ? 'email' : 'text'} // Tipo de input dinámico
+              type={role === 'admin' ? 'email' : 'text'}
               id="identifier"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
@@ -139,8 +144,12 @@ const AuthScreen = ({ onLogin }) => {
           </button>
         </form>
       </div>
+      <p className="text-center text-gray-500 text-sm mt-4">Desarrollado por jabriles</p>
     </div>
   );
 };
 
 export default AuthScreen;
+
+
+// DONE
