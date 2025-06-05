@@ -1,0 +1,146 @@
+import React, { useState } from 'react';
+import Logo from '../Logo'; // Importar el componente Logo
+
+const AuthScreen = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
+  const [password, setPassword] = useState(''); // Para la contraseña del admin
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError(''); // Limpiar errores previos
+
+    if (!email) {
+      setError('Por favor, ingresa tu correo electrónico.');
+      return;
+    }
+
+    if (!role) {
+      setError('Por favor, selecciona tu tipo de usuario.');
+      return;
+    }
+
+    // Validación de correo Gmail
+    if (!email.endsWith('@gmail.com')) {
+      setError('Solo se permiten correos de Gmail.');
+      return;
+    }
+
+    // Validación específica para administrador
+    if (role === 'admin') {
+      // Contraseñas fijas (para el administrador principal)
+      if (password === 'abriles320580') {
+        // Este es el super-admin, tiene todos los permisos por defecto
+        onLogin(email, {
+          role: 'admin_full',
+          canManageCollaborators: true,
+          canManageGroups: true
+        });
+        return;
+      } else if (password === 'calidadh2o') {
+        // Este es el admin de reportes fijo, sin gestión
+        onLogin(email, {
+          role: 'admin_reports',
+          canManageCollaborators: false,
+          canManageGroups: false
+        });
+        return;
+      }
+
+      // Luego, busca en la lista de administradores registrados dinámicamente
+      const adminUsers = JSON.parse(localStorage.getItem('adminUsers') || '[]');
+      const foundAdmin = adminUsers.find(user => user.email === email && user.password === password);
+
+      if (foundAdmin) {
+        // Si se encuentra, usa los permisos definidos para ese usuario
+        onLogin(email, {
+          role: foundAdmin.role,
+          canManageCollaborators: foundAdmin.canManageCollaborators,
+          canManageGroups: foundAdmin.canManageGroups
+        });
+      } else {
+        setError('Credenciales de administrador incorrectas o no registrado.');
+      }
+      return; // Salir después de intentar login de admin
+    }
+
+    // Si es colaborador, simplemente loguear
+    onLogin(email, { role: 'employee' });
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <div className="mb-8 flex justify-center">
+          <Logo /> {/* Aquí se inserta el logo */}
+        </div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Control de Asistencia</h1>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-2">Correo Gmail</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              placeholder="tu.correo@gmail.com"
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-medium mb-2">Tipo de usuario</label>
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={() => { setRole('employee'); setPassword(''); }} // Limpiar contraseña si cambia a colaborador
+                className={`flex-1 px-4 py-2 rounded-lg transition-all duration-200 ${role === 'employee' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              >
+                Colaborador
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('admin')}
+                className={`flex-1 px-4 py-2 rounded-lg transition-all duration-200 ${role === 'admin' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              >
+                Administrador
+              </button>
+            </div>
+          </div>
+
+          {role === 'admin' && (
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-gray-700 text-sm font-medium mb-2">Contraseña de Administrador</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                placeholder="Ingresa la contraseña"
+                required
+              />
+            </div>
+          )}
+
+          {error && <p className="text-red-600 text-sm mb-4 text-center">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full bg-blue-700 text-white py-3 px-4 rounded-lg hover:bg-blue-800 transition-colors duration-200 text-lg font-semibold shadow-md"
+          >
+            Acceder
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AuthScreen;
+
+
+// DONE
