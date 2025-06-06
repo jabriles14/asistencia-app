@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const EmployeeRegisterForm = ({ userEmail, onBack }) => {
+const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail es el email del colaborador
   const [attendanceStatus, setAttendanceStatus] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
   const [groups, setGroups] = useState([]);
@@ -17,15 +17,17 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
     setGroups(storedGroups);
 
     const allRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
-    const userSpecificRecords = allRecords.filter(record => record.email === userEmail);
+    // Filtrar por el email del colaborador (userEmail)
+    const userSpecificRecords = allRecords.filter(record => record.email === userEmail); 
     setRecentRecords(userSpecificRecords.slice(-3).reverse());
 
     const storedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
-    const currentCollaborator = storedCollaborators.find(collab => collab.email === userEmail);
+    // Buscar colaborador por email
+    const currentCollaborator = storedCollaborators.find(collab => collab.email === userEmail); 
     if (currentCollaborator) {
       setCollaboratorName(currentCollaborator.fullName);
     } else {
-      setCollaboratorName(userEmail);
+      setCollaboratorName(userEmail); // Mostrar email si no se encuentra nombre
     }
 
     // Verificar si ya registró entrada hoy
@@ -49,7 +51,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
     }
     
     const record = {
-      email: userEmail,
+      email: userEmail, // Guardar el email como identificador
       date: new Date().toISOString().split('T')[0],
       status: attendanceStatus,
       group: selectedGroup,
@@ -75,7 +77,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => {
     }
 
     const record = {
-      email: userEmail,
+      email: userEmail, // Guardar el email como identificador
       date: new Date().toISOString().split('T')[0],
       status: 'exit',
       reason: exitReason,

@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthScreen from './components/Auth/AuthScreen';
 import EmployeeRegisterForm from './components/Employee/EmployeeRegisterForm';
 import AdminPanel from './components/Admin/AdminPanel';
+import { employees as initialEmployees } from './mock/employees'; // Importar la lista inicial de colaboradores
 
 const App = () => {
   const [currentView, setCurrentView] = useState('auth');
-  const [userData, setUserData] = useState(null); // userData ahora es un objeto con { email, role, canManageCollaborators, canManageGroups }
+  const [userData, setUserData] = useState(null);
 
-  const handleLogin = (email, roleData) => { // roleData ahora es el objeto de permisos
-    setUserData({ email, ...roleData }); // Desestructurar roleData para obtener role y permisos
+  // useEffect para inicializar localStorage con datos mock si está vacío
+  useEffect(() => {
+    // Inicializar colaboradores
+    const savedCollaborators = localStorage.getItem('employees');
+    if (!savedCollaborators || JSON.parse(savedCollaborators).length === 0) {
+      localStorage.setItem('employees', JSON.stringify(initialEmployees));
+    }
+
+    // Inicializar grupos (volver a la versión donde no hay mock/groups.js)
+    const savedGroups = localStorage.getItem('groups');
+    if (!savedGroups || JSON.parse(savedGroups).length === 0) {
+      // Si no hay grupos guardados, inicializar con una lista vacía o por defecto
+      localStorage.setItem('groups', JSON.stringify([])); 
+    }
+  }, []); // Se ejecuta solo una vez al montar el componente App
+
+  const handleLogin = (email, roleData) => {
+    setUserData({ email, ...roleData });
     setCurrentView(roleData.role === 'employee' ? 'employee' : 'admin');
   };
 
@@ -24,7 +41,6 @@ const App = () => {
       case 'employee':
         return <EmployeeRegisterForm userEmail={userData.email} onBack={handleLogout} />;
       case 'admin':
-        // Pasar el objeto userData completo al AdminPanel
         return <AdminPanel onBack={handleLogout} userData={userData} />;
       default:
         return <AuthScreen onLogin={handleLogin} />;

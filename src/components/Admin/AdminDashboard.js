@@ -66,10 +66,11 @@ const AdminDashboard = ({ onBack }) => {
     .filter(record => statusFilter === 'all' || record.status === statusFilter)
     .filter(record => groupFilter === 'all' || record.group === groupFilter)
     .map(record => {
+      // Buscar colaborador por email (record.email)
       const collaborator = collaborators.find(collab => collab.email === record.email);
       return {
         ...record,
-        collaboratorInfo: collaborator || { fullName: 'Desconocido', email: record.email }
+        collaboratorInfo: collaborator || { fullName: `Colaborador (${record.email})`, email: record.email }
       };
     });
 
@@ -343,6 +344,3 @@ const AdminDashboard = ({ onBack }) => {
 };
 
 export default AdminDashboard;
-
-
-// DONE
