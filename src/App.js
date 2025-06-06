@@ -22,7 +22,12 @@ const App = () => {
       // Puedes definir algunos grupos iniciales aquí si quieres
       const defaultGroups = [
         { id: 1, name: "Grupo A" },
-        { id: 2, name: "Grupo B" }
+        { id: 2, name: "Grupo B" },
+        { id: 3, name: "Grupo C" },
+        { id: 4, name: "Grupo D" },
+        { id: 5, name: "Grupo E" },
+        { id: 6, name: "Grupo F" },
+        { id: 7, name: "Grupo G" }
       ];
       localStorage.setItem('groups', JSON.stringify(defaultGroups));
     }
