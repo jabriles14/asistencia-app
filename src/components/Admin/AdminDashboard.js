@@ -13,6 +13,7 @@ const AdminDashboard = ({ onBack }) => {
   const [groupCounts, setGroupCounts] = useState({});
 
   // Cargar datos de localStorage y calcular faltas injustificadas
+  // Este useEffect se ejecutará al montar el componente y cada vez que dateFilter cambie
   useEffect(() => {
     const storedRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
     const storedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
@@ -21,7 +22,7 @@ const AdminDashboard = ({ onBack }) => {
     setCollaborators(storedCollaborators);
     setGroups(storedGroups);
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = dateFilter; // Usar la fecha del filtro para el resumen diario
     const todayRecords = storedRecords.filter(r => r.date === today);
     
     const presentCount = todayRecords.filter(r => r.status === 'present').length;
@@ -30,10 +31,10 @@ const AdminDashboard = ({ onBack }) => {
     const absentCount = todayRecords.filter(r => r.status === 'absent').length;
     const exitCount = todayRecords.filter(r => r.status === 'exit').length;
 
-    // Colaboradores que SÍ registraron entrada hoy
+    // Colaboradores que SÍ registraron entrada hoy (para la fecha del filtro)
     const registeredEmailsToday = new Set(todayRecords.filter(r => r.type === 'entry').map(r => r.email));
     
-    // Colaboradores que NO registraron entrada hoy
+    // Colaboradores que NO registraron entrada hoy (para la fecha del filtro)
     const currentlyUnregistered = storedCollaborators.filter(collab => !registeredEmailsToday.has(collab.email));
     setUnregisteredCollaborators(currentlyUnregistered);
 
@@ -48,6 +49,7 @@ const AdminDashboard = ({ onBack }) => {
       exit: exitCount
     });
 
+    // Obtener los últimos 5 registros (sin importar la fecha)
     const sortedRecords = [...storedRecords].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     setLastFiveRecords(sortedRecords.slice(0, 5));
 
@@ -59,7 +61,7 @@ const AdminDashboard = ({ onBack }) => {
     }, {});
     setGroupCounts(counts);
 
-  }, [dateFilter]);
+  }, [dateFilter]); // Dependencia: dateFilter. Se recarga cuando cambia la fecha.
 
   const filteredRecords = records
     .filter(record => record.date === dateFilter)
