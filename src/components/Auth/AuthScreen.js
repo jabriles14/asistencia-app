@@ -41,12 +41,14 @@ const AuthScreen = ({ onLogin }) => {
       // Contraseñas fijas (para el administrador principal)
       if (password === 'abriles320580') {
         adminRoleData = {
+          email: identifier, // Usar el identifier como email para el admin
           role: 'admin_full',
           canManageCollaborators: true,
           canManageGroups: true
         };
       } else if (password === 'calidadh2o') {
         adminRoleData = {
+          email: identifier, // Usar el identifier como email para el admin
           role: 'admin_reports',
           canManageCollaborators: false,
           canManageGroups: false
@@ -67,7 +69,7 @@ const AuthScreen = ({ onLogin }) => {
 
       if (adminRoleData) {
         // Guarda la sesión del administrador en localStorage
-        localStorage.setItem('currentAdminSession', JSON.stringify({ email: identifier, ...adminRoleData }));
+        localStorage.setItem('currentAdminSession', JSON.stringify(adminRoleData)); // Guardar el objeto completo
         onLogin(identifier, adminRoleData);
       } else {
         setError('Credenciales de administrador incorrectas o no registrado.');

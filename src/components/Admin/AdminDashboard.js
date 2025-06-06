@@ -12,11 +12,12 @@ const AdminDashboard = ({ onBack }) => {
   const [unregisteredCollaborators, setUnregisteredCollaborators] = useState([]);
   const [groupCounts, setGroupCounts] = useState({});
 
-  // Función para cargar y procesar todos los datos
+  // Función para cargar y procesar todos los datos desde localStorage
   const loadData = () => {
     const storedRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
     const storedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
     const storedGroups = JSON.parse(localStorage.getItem('groups') || '[]');
+    
     setRecords(storedRecords);
     setCollaborators(storedCollaborators);
     setGroups(storedGroups);
@@ -64,7 +65,7 @@ const AdminDashboard = ({ onBack }) => {
   // Cargar datos al montar el componente y cuando cambie la fecha del filtro
   useEffect(() => {
     loadData();
-  }, [dateFilter]);
+  }, [dateFilter]); // Dependencia: dateFilter. Se recarga cuando cambia la fecha.
 
   const filteredRecords = records
     .filter(record => record.date === dateFilter)
