@@ -31,10 +31,10 @@ const AdminDashboard = ({ onBack }) => {
     const exitCount = todayRecords.filter(r => r.status === 'exit').length;
 
     // Colaboradores que SÍ registraron entrada hoy
-    const registeredEmailsToday = new Set(todayRecords.filter(r => r.type === 'entry').map(r => r.email));
+    const registeredCodesToday = new Set(todayRecords.filter(r => r.type === 'entry').map(r => r.code)); // Filtrar por código
     
     // Colaboradores que NO registraron entrada hoy
-    const currentlyUnregistered = storedCollaborators.filter(collab => !registeredEmailsToday.has(collab.email));
+    const currentlyUnregistered = storedCollaborators.filter(collab => !registeredCodesToday.has(collab.code)); // Filtrar por código
     setUnregisteredCollaborators(currentlyUnregistered);
 
     const unjustifiedAbsenceCount = currentlyUnregistered.length;
@@ -66,11 +66,11 @@ const AdminDashboard = ({ onBack }) => {
     .filter(record => statusFilter === 'all' || record.status === statusFilter)
     .filter(record => groupFilter === 'all' || record.group === groupFilter)
     .map(record => {
-      // Buscar colaborador por email (record.email)
-      const collaborator = collaborators.find(collab => collab.email === record.email);
+      // Buscar colaborador por código (record.code)
+      const collaborator = collaborators.find(collab => collab.code === record.code);
       return {
         ...record,
-        collaboratorInfo: collaborator || { fullName: `Colaborador (${record.email})`, email: record.email }
+        collaboratorInfo: collaborator || { fullName: `Colaborador (${record.code})`, email: `${record.code}@example.com` } // Mostrar código si no se encuentra nombre
       };
     });
 
@@ -198,7 +198,7 @@ const AdminDashboard = ({ onBack }) => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th> {/* Cambiado de Correo a Código */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo/Tipo</th>
@@ -213,7 +213,7 @@ const AdminDashboard = ({ onBack }) => {
                       {record.collaboratorInfo.fullName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {record.email}
+                      {record.code} {/* Mostrar código */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {record.group || 'N/A'}
@@ -251,7 +251,7 @@ const AdminDashboard = ({ onBack }) => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
               </tr>
             </thead>
@@ -263,7 +263,7 @@ const AdminDashboard = ({ onBack }) => {
                       {collaborator.fullName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {collaborator.email}
+                      {collaborator.code}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor('absent')}`}>
@@ -292,7 +292,7 @@ const AdminDashboard = ({ onBack }) => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo/Tipo</th>
@@ -302,14 +302,14 @@ const AdminDashboard = ({ onBack }) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {lastFiveRecords.length > 0 ? (
                 lastFiveRecords.map((record, index) => {
-                  const collaborator = collaborators.find(collab => collab.email === record.email);
+                  const collaborator = collaborators.find(collab => collab.code === record.code);
                   return (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {collaborator?.fullName || 'Desconocido'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {record.email}
+                        {record.code}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {record.group || 'N/A'}

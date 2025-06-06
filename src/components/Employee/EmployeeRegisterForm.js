@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail es el email del colaborador
+const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail ahora es el código del colaborador
   const [attendanceStatus, setAttendanceStatus] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
   const [groups, setGroups] = useState([]);
@@ -17,17 +17,17 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail es el ema
     setGroups(storedGroups);
 
     const allRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
-    // Filtrar por el email del colaborador (userEmail)
-    const userSpecificRecords = allRecords.filter(record => record.email === userEmail); 
+    // Filtrar por el código del colaborador (userEmail ahora es el código)
+    const userSpecificRecords = allRecords.filter(record => record.code === userEmail); 
     setRecentRecords(userSpecificRecords.slice(-3).reverse());
 
     const storedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
-    // Buscar colaborador por email
-    const currentCollaborator = storedCollaborators.find(collab => collab.email === userEmail); 
+    // Buscar colaborador por código
+    const currentCollaborator = storedCollaborators.find(collab => collab.code === userEmail); 
     if (currentCollaborator) {
       setCollaboratorName(currentCollaborator.fullName);
     } else {
-      setCollaboratorName(userEmail); // Mostrar email si no se encuentra nombre
+      setCollaboratorName(`Colaborador (${userEmail})`); // Mostrar código si no se encuentra nombre
     }
 
     // Verificar si ya registró entrada hoy
@@ -51,7 +51,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail es el ema
     }
     
     const record = {
-      email: userEmail, // Guardar el email como identificador
+      code: userEmail, // Guardar el código como identificador
       date: new Date().toISOString().split('T')[0],
       status: attendanceStatus,
       group: selectedGroup,
@@ -77,7 +77,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail es el ema
     }
 
     const record = {
-      email: userEmail, // Guardar el email como identificador
+      code: userEmail, // Guardar el código como identificador
       date: new Date().toISOString().split('T')[0],
       status: 'exit',
       reason: exitReason,
