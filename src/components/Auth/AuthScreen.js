@@ -57,6 +57,7 @@ const AuthScreen = ({ onLogin }) => {
         const foundAdmin = adminUsers.find(user => user.email === identifier && user.password === password);
         if (foundAdmin) {
           adminRoleData = {
+            email: foundAdmin.email, // Asegurarse de pasar el email del admin encontrado
             role: foundAdmin.role,
             canManageCollaborators: foundAdmin.canManageCollaborators,
             canManageGroups: foundAdmin.canManageGroups
@@ -165,3 +166,6 @@ const AuthScreen = ({ onLogin }) => {
 };
 
 export default AuthScreen;
+
+
+// DONE

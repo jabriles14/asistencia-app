@@ -12,9 +12,8 @@ const AdminDashboard = ({ onBack }) => {
   const [unregisteredCollaborators, setUnregisteredCollaborators] = useState([]);
   const [groupCounts, setGroupCounts] = useState({});
 
-  // Cargar datos de localStorage y calcular faltas injustificadas
-  // Este useEffect se ejecutará al montar el componente y cada vez que dateFilter cambie
-  useEffect(() => {
+  // Función para cargar y procesar todos los datos
+  const loadData = () => {
     const storedRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
     const storedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
     const storedGroups = JSON.parse(localStorage.getItem('groups') || '[]');
@@ -60,8 +59,12 @@ const AdminDashboard = ({ onBack }) => {
       return acc;
     }, {});
     setGroupCounts(counts);
+  };
 
-  }, [dateFilter]); // Dependencia: dateFilter. Se recarga cuando cambia la fecha.
+  // Cargar datos al montar el componente y cuando cambie la fecha del filtro
+  useEffect(() => {
+    loadData();
+  }, [dateFilter]);
 
   const filteredRecords = records
     .filter(record => record.date === dateFilter)
@@ -192,6 +195,12 @@ const AdminDashboard = ({ onBack }) => {
               ))}
             </select>
           </div>
+          <button
+            onClick={loadData} // Botón para actualizar datos
+            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 shadow-md"
+          >
+            Actualizar Datos
+          </button>
         </div>
 
         <div className="overflow-x-auto">
@@ -345,6 +354,3 @@ const AdminDashboard = ({ onBack }) => {
 };
 
 export default AdminDashboard;
-
-
-// DONE
