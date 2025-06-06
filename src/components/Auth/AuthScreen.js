@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Logo from '../Logo';
 
 const AuthScreen = ({ onLogin }) => {
@@ -6,6 +6,19 @@ const AuthScreen = ({ onLogin }) => {
   const [role, setRole] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // Nuevo useEffect para inicializar colaboradores si no existen
+  useEffect(() => {
+    const savedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
+    if (savedCollaborators.length === 0) {
+      // Si no hay colaboradores en localStorage, inicializar con la lista del mock
+      // Importar initialEmployees aquí para evitar circular dependency si se importa en App.js
+      import('../../mock/employees').then(({ initialEmployees }) => {
+        localStorage.setItem('employees', JSON.stringify(initialEmployees));
+        // No es necesario setear el estado aquí, ya que el componente EmployeeManagement lo leerá
+      });
+    }
+  }, []); // Se ejecuta solo una vez al montar el componente
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -147,3 +160,6 @@ const AuthScreen = ({ onLogin }) => {
 };
 
 export default AuthScreen;
+
+
+// DONE
