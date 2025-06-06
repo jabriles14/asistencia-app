@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail ahora es el código del colaborador
+const EmployeeRegisterForm = ({ collaboratorCode, onBack }) => { // Recibe el código del colaborador
   const [attendanceStatus, setAttendanceStatus] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
   const [groups, setGroups] = useState([]);
@@ -17,17 +17,21 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail ahora es 
     setGroups(storedGroups);
 
     const allRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
-    // Filtrar por el código del colaborador (userEmail ahora es el código)
-    const userSpecificRecords = allRecords.filter(record => record.code === userEmail); 
+    // Filtrar por el código del colaborador (collaboratorCode)
+    const userSpecificRecords = allRecords.filter(record => record.code === collaboratorCode); 
     setRecentRecords(userSpecificRecords.slice(-3).reverse());
 
     const storedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
     // Buscar colaborador por código
-    const currentCollaborator = storedCollaborators.find(collab => collab.code === userEmail); 
+    const currentCollaborator = storedCollaborators.find(collab => collab.code === collaboratorCode); 
     if (currentCollaborator) {
       setCollaboratorName(currentCollaborator.fullName);
+      // Si el colaborador tiene un grupo predefinido, seleccionarlo
+      if (currentCollaborator.group && storedGroups.some(g => g.name === currentCollaborator.group)) {
+        setSelectedGroup(currentCollaborator.group);
+      }
     } else {
-      setCollaboratorName(`Colaborador (${userEmail})`); // Mostrar código si no se encuentra nombre
+      setCollaboratorName(`Colaborador (${collaboratorCode})`); // Mostrar código si no se encuentra nombre
     }
 
     // Verificar si ya registró entrada hoy
@@ -37,7 +41,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail ahora es 
     );
     setHasRegisteredToday(!!todayEntryRecord);
 
-  }, [userEmail, submitted, exitSubmitted]);
+  }, [collaboratorCode, submitted, exitSubmitted]); // Dependencias actualizadas
 
   const handleSubmitEntry = (e) => {
     e.preventDefault();
@@ -51,7 +55,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail ahora es 
     }
     
     const record = {
-      code: userEmail, // Guardar el código como identificador
+      code: collaboratorCode, // Guardar el código como identificador
       date: new Date().toISOString().split('T')[0],
       status: attendanceStatus,
       group: selectedGroup,
@@ -65,7 +69,8 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail ahora es 
     
     setSubmitted(true);
     setAttendanceStatus('');
-    setSelectedGroup('');
+    // No limpiar selectedGroup si ya viene precargado
+    // setSelectedGroup(''); 
     setTimeout(() => setSubmitted(false), 3000);
   };
 
@@ -77,7 +82,7 @@ const EmployeeRegisterForm = ({ userEmail, onBack }) => { // userEmail ahora es 
     }
 
     const record = {
-      code: userEmail, // Guardar el código como identificador
+      code: collaboratorCode, // Guardar el código como identificador
       date: new Date().toISOString().split('T')[0],
       status: 'exit',
       reason: exitReason,

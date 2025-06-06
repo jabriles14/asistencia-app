@@ -16,16 +16,16 @@ const App = () => {
       localStorage.setItem('employees', JSON.stringify(initialEmployees));
     }
 
-    // Inicializar grupos (volver a la versión donde no hay mock/groups.js)
+    // Inicializar grupos
     const savedGroups = localStorage.getItem('groups');
     if (!savedGroups || JSON.parse(savedGroups).length === 0) {
-      // Si no hay grupos guardados, inicializar con una lista vacía o por defecto
+      // Si no hay grupos guardados, inicializar con una lista vacía
       localStorage.setItem('groups', JSON.stringify([])); 
     }
   }, []); // Se ejecuta solo una vez al montar el componente App
 
-  const handleLogin = (email, roleData) => {
-    setUserData({ email, ...roleData });
+  const handleLogin = (identifier, roleData) => { // identifier puede ser email (admin) o code (employee)
+    setUserData({ identifier, ...roleData }); // Guardar el identificador
     setCurrentView(roleData.role === 'employee' ? 'employee' : 'admin');
   };
 
@@ -39,7 +39,8 @@ const App = () => {
       case 'auth':
         return <AuthScreen onLogin={handleLogin} />;
       case 'employee':
-        return <EmployeeRegisterForm userEmail={userData.email} onBack={handleLogout} />;
+        // Pasar el identificador (código) al EmployeeRegisterForm
+        return <EmployeeRegisterForm collaboratorCode={userData.identifier} onBack={handleLogout} />;
       case 'admin':
         return <AdminPanel onBack={handleLogout} userData={userData} />;
       default:

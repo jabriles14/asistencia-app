@@ -6,9 +6,8 @@ const EmployeeManagement = () => {
   const [newCollaborator, setNewCollaborator] = useState({
     name: '',
     lastName: '',
-    email: '', // El email se generará internamente
-    group: '',
-    code: '' // Campo de código
+    email: '', // Vuelve el email
+    group: ''
   });
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState('');
@@ -38,24 +37,27 @@ const EmployeeManagement = () => {
 
   const handleAddCollaborator = () => {
     setError('');
-    if (!newCollaborator.name || !newCollaborator.lastName || !newCollaborator.group || !newCollaborator.code) {
+    if (!newCollaborator.name || !newCollaborator.lastName || !newCollaborator.email || !newCollaborator.group) {
       setError('Todos los campos son obligatorios.');
       return;
     }
-    if (collaborators.some(collab => collab.code === newCollaborator.code)) {
-      setError('Este código ya está en uso.');
+    if (!newCollaborator.email.endsWith('@gmail.com')) {
+      setError('El correo debe ser de Gmail.');
+      return;
+    }
+    if (collaborators.some(collab => collab.email === newCollaborator.email)) {
+      setError('Este correo ya está registrado.');
       return;
     }
     
     const updatedCollaborators = [...collaborators, {
       id: Date.now(),
       fullName: `${newCollaborator.name} ${newCollaborator.lastName}`,
-      email: `${newCollaborator.code}@example.com`, // Generar email interno basado en el código
       ...newCollaborator
     }];
     
     setCollaborators(updatedCollaborators);
-    setNewCollaborator({ name: '', lastName: '', email: '', group: '', code: '' });
+    setNewCollaborator({ name: '', lastName: '', email: '', group: '' });
   };
 
   const handleDeleteCollaborator = (id) => {
@@ -86,6 +88,15 @@ const EmployeeManagement = () => {
           className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           required
         />
+        <input
+          type="email"
+          name="email"
+          value={newCollaborator.email}
+          onChange={handleInputChange}
+          placeholder="Correo electrónico (Gmail)"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          required
+        />
         <select
           name="group"
           value={newCollaborator.group}
@@ -98,15 +109,6 @@ const EmployeeManagement = () => {
             <option key={group.id} value={group.name}>{group.name}</option>
           ))}
         </select>
-        <input
-          type="text"
-          name="code"
-          value={newCollaborator.code}
-          onChange={handleInputChange}
-          placeholder="Código de acceso"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          required
-        />
       </div>
       
       {error && <p className="text-red-600 text-sm mb-4 text-center">{error}</p>}
@@ -123,8 +125,8 @@ const EmployeeManagement = () => {
           <thead className="bg-gray-100">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
@@ -133,8 +135,8 @@ const EmployeeManagement = () => {
               collaborators.map(collaborator => (
                 <tr key={collaborator.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{collaborator.fullName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{collaborator.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{collaborator.group || 'N/A'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{collaborator.code}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleDeleteCollaborator(collaborator.id)}
@@ -160,3 +162,6 @@ const EmployeeManagement = () => {
 };
 
 export default EmployeeManagement;
+
+
+// DONE
