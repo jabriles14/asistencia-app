@@ -9,6 +9,7 @@ const App = () => {
   const [userData, setUserData] = useState(null); // userData ahora incluye el rol específico (admin_full, admin_reports)
 
   // useEffect para inicializar colaboradores y grupos en localStorage si no existen
+  // y para cargar la sesión de administrador o colaborador si existe
   useEffect(() => {
     // Inicializar colaboradores
     const savedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
@@ -29,6 +30,15 @@ const App = () => {
       localStorage.setItem('groups', JSON.stringify(defaultGroups));
     }
 
+    // Verificar si hay una sesión de administrador guardada
+    const storedAdminSession = localStorage.getItem('currentAdminSession');
+    if (storedAdminSession) {
+      const adminData = JSON.parse(storedAdminSession);
+      setUserData(adminData);
+      setCurrentView('admin');
+      return; // Si hay sesión de admin, no verificar colaborador
+    }
+
     // Verificar si hay un colaborador logueado en localStorage
     const storedCollaboratorEmail = localStorage.getItem('currentCollaboratorEmail');
     if (storedCollaboratorEmail) {
@@ -47,6 +57,7 @@ const App = () => {
     setUserData(null);
     setCurrentView('auth');
     localStorage.removeItem('currentCollaboratorEmail'); // Limpiar el email del colaborador al cerrar sesión
+    localStorage.removeItem('currentAdminSession'); // Limpiar la sesión del administrador al cerrar sesión
   };
 
   const renderView = () => {

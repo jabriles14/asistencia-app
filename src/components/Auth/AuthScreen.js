@@ -36,33 +36,38 @@ const AuthScreen = ({ onLogin }) => {
 
     // Validación para administradores
     if (role === 'admin') {
+      let adminRoleData = null;
+
       // Contraseñas fijas (para el administrador principal)
       if (password === 'abriles320580') {
-        onLogin(identifier, {
+        adminRoleData = {
           role: 'admin_full',
           canManageCollaborators: true,
           canManageGroups: true
-        });
-        return;
+        };
       } else if (password === 'calidadh2o') {
-        onLogin(identifier, {
+        adminRoleData = {
           role: 'admin_reports',
           canManageCollaborators: false,
           canManageGroups: false
-        });
-        return;
+        };
+      } else {
+        // Busca en la lista de administradores registrados dinámicamente
+        const adminUsers = JSON.parse(localStorage.getItem('adminUsers') || '[]');
+        const foundAdmin = adminUsers.find(user => user.email === identifier && user.password === password);
+        if (foundAdmin) {
+          adminRoleData = {
+            role: foundAdmin.role,
+            canManageCollaborators: foundAdmin.canManageCollaborators,
+            canManageGroups: foundAdmin.canManageGroups
+          };
+        }
       }
 
-      // Busca en la lista de administradores registrados dinámicamente
-      const adminUsers = JSON.parse(localStorage.getItem('adminUsers') || '[]');
-      const foundAdmin = adminUsers.find(user => user.email === identifier && user.password === password);
-
-      if (foundAdmin) {
-        onLogin(identifier, {
-          role: foundAdmin.role,
-          canManageCollaborators: foundAdmin.canManageCollaborators,
-          canManageGroups: foundAdmin.canManageGroups
-        });
+      if (adminRoleData) {
+        // Guarda la sesión del administrador en localStorage
+        localStorage.setItem('currentAdminSession', JSON.stringify({ email: identifier, ...adminRoleData }));
+        onLogin(identifier, adminRoleData);
       } else {
         setError('Credenciales de administrador incorrectas o no registrado.');
       }
@@ -160,6 +165,3 @@ const AuthScreen = ({ onLogin }) => {
 };
 
 export default AuthScreen;
-
-
-// DONE
