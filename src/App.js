@@ -2,36 +2,30 @@ import React, { useState, useEffect } from 'react';
 import AuthScreen from './components/Auth/AuthScreen';
 import EmployeeRegisterForm from './components/Employee/EmployeeRegisterForm';
 import AdminPanel from './components/Admin/AdminPanel';
-import { employees as initialEmployees } from './mock/employees'; // Importar la lista inicial de colaboradores
 
 const App = () => {
   const [currentView, setCurrentView] = useState('auth');
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState(null); // userData ahora incluye el rol específico (admin_full, admin_reports)
 
-  // useEffect para inicializar localStorage con datos mock si está vacío
+  // Nuevo useEffect para verificar si hay un colaborador logueado en localStorage
   useEffect(() => {
-    // Inicializar colaboradores
-    const savedCollaborators = localStorage.getItem('employees');
-    if (!savedCollaborators || JSON.parse(savedCollaborators).length === 0) {
-      localStorage.setItem('employees', JSON.stringify(initialEmployees));
+    const storedCollaboratorEmail = localStorage.getItem('currentCollaboratorEmail');
+    if (storedCollaboratorEmail) {
+      // Si hay un email guardado, asume que es un colaborador y lo loguea automáticamente
+      setUserData({ email: storedCollaboratorEmail, role: 'employee' });
+      setCurrentView('employee');
     }
+  }, []); // Se ejecuta solo una vez al cargar la aplicación
 
-    // Inicializar grupos
-    const savedGroups = localStorage.getItem('groups');
-    if (!savedGroups || JSON.parse(savedGroups).length === 0) {
-      // Si no hay grupos guardados, inicializar con una lista vacía
-      localStorage.setItem('groups', JSON.stringify([])); 
-    }
-  }, []); // Se ejecuta solo una vez al montar el componente App
-
-  const handleLogin = (identifier, roleData) => { // identifier puede ser email (admin) o code (employee)
-    setUserData({ identifier, ...roleData }); // Guardar el identificador
+  const handleLogin = (email, roleData) => { // roleData ahora es el objeto de permisos
+    setUserData({ email, ...roleData }); // Desestructurar roleData para obtener role y permisos
     setCurrentView(roleData.role === 'employee' ? 'employee' : 'admin');
   };
 
   const handleLogout = () => {
     setUserData(null);
     setCurrentView('auth');
+    localStorage.removeItem('currentCollaboratorEmail'); // Limpiar el email del colaborador al cerrar sesión
   };
 
   const renderView = () => {
@@ -39,9 +33,9 @@ const App = () => {
       case 'auth':
         return <AuthScreen onLogin={handleLogin} />;
       case 'employee':
-        // Pasar el identificador (código) al EmployeeRegisterForm
-        return <EmployeeRegisterForm collaboratorCode={userData.identifier} onBack={handleLogout} />;
+        return <EmployeeRegisterForm userEmail={userData.email} onBack={handleLogout} />;
       case 'admin':
+        // Pasar el objeto userData completo al AdminPanel
         return <AdminPanel onBack={handleLogout} userData={userData} />;
       default:
         return <AuthScreen onLogin={handleLogin} />;
@@ -66,3 +60,6 @@ const App = () => {
 };
 
 export default App;
+
+
+// DONE

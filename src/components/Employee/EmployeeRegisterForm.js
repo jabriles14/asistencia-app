@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const EmployeeRegisterForm = ({ collaboratorCode, onBack }) => { // Recibe el c√≥digo del colaborador
+const EmployeeRegisterForm = ({ userEmail, onBack }) => {
   const [attendanceStatus, setAttendanceStatus] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
   const [groups, setGroups] = useState([]);
@@ -17,21 +17,15 @@ const EmployeeRegisterForm = ({ collaboratorCode, onBack }) => { // Recibe el c√
     setGroups(storedGroups);
 
     const allRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
-    // Filtrar por el c√≥digo del colaborador (collaboratorCode)
-    const userSpecificRecords = allRecords.filter(record => record.code === collaboratorCode); 
+    const userSpecificRecords = allRecords.filter(record => record.email === userEmail);
     setRecentRecords(userSpecificRecords.slice(-3).reverse());
 
     const storedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
-    // Buscar colaborador por c√≥digo
-    const currentCollaborator = storedCollaborators.find(collab => collab.code === collaboratorCode); 
+    const currentCollaborator = storedCollaborators.find(collab => collab.email === userEmail);
     if (currentCollaborator) {
       setCollaboratorName(currentCollaborator.fullName);
-      // Si el colaborador tiene un grupo predefinido, seleccionarlo
-      if (currentCollaborator.group && storedGroups.some(g => g.name === currentCollaborator.group)) {
-        setSelectedGroup(currentCollaborator.group);
-      }
     } else {
-      setCollaboratorName(`Colaborador (${collaboratorCode})`); // Mostrar c√≥digo si no se encuentra nombre
+      setCollaboratorName(userEmail);
     }
 
     // Verificar si ya registr√≥ entrada hoy
@@ -41,7 +35,7 @@ const EmployeeRegisterForm = ({ collaboratorCode, onBack }) => { // Recibe el c√
     );
     setHasRegisteredToday(!!todayEntryRecord);
 
-  }, [collaboratorCode, submitted, exitSubmitted]); // Dependencias actualizadas
+  }, [userEmail, submitted, exitSubmitted]);
 
   const handleSubmitEntry = (e) => {
     e.preventDefault();
@@ -55,7 +49,7 @@ const EmployeeRegisterForm = ({ collaboratorCode, onBack }) => { // Recibe el c√
     }
     
     const record = {
-      code: collaboratorCode, // Guardar el c√≥digo como identificador
+      email: userEmail,
       date: new Date().toISOString().split('T')[0],
       status: attendanceStatus,
       group: selectedGroup,
@@ -69,8 +63,7 @@ const EmployeeRegisterForm = ({ collaboratorCode, onBack }) => { // Recibe el c√
     
     setSubmitted(true);
     setAttendanceStatus('');
-    // No limpiar selectedGroup si ya viene precargado
-    // setSelectedGroup(''); 
+    setSelectedGroup('');
     setTimeout(() => setSubmitted(false), 3000);
   };
 
@@ -82,7 +75,7 @@ const EmployeeRegisterForm = ({ collaboratorCode, onBack }) => { // Recibe el c√
     }
 
     const record = {
-      code: collaboratorCode, // Guardar el c√≥digo como identificador
+      email: userEmail,
       date: new Date().toISOString().split('T')[0],
       status: 'exit',
       reason: exitReason,

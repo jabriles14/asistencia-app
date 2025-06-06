@@ -16,10 +16,6 @@ const AdminUserManagement = () => {
     setAdminUsers(savedAdminUsers);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('adminUsers', JSON.stringify(adminUsers));
-  }, [adminUsers]);
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setNewAdmin(prev => ({
@@ -45,6 +41,7 @@ const AdminUserManagement = () => {
 
     const updatedAdminUsers = [...adminUsers, { id: Date.now(), ...newAdmin }];
     setAdminUsers(updatedAdminUsers);
+    localStorage.setItem('adminUsers', JSON.stringify(updatedAdminUsers));
     setNewAdmin({
       email: '',
       password: '',
@@ -57,6 +54,7 @@ const AdminUserManagement = () => {
   const handleDeleteAdmin = (id) => {
     const updatedAdminUsers = adminUsers.filter(user => user.id !== id);
     setAdminUsers(updatedAdminUsers);
+    localStorage.setItem('adminUsers', JSON.stringify(updatedAdminUsers));
   };
 
   // Función para exportar datos
@@ -241,3 +239,6 @@ const AdminUserManagement = () => {
 };
 
 export default AdminUserManagement;
+
+
+// DONE

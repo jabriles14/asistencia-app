@@ -10,10 +10,6 @@ const GroupManagement = () => {
     setGroups(savedGroups);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('groups', JSON.stringify(groups));
-  }, [groups]);
-
   const handleAddGroup = () => {
     setError('');
     if (!newGroupName.trim()) {
@@ -31,12 +27,14 @@ const GroupManagement = () => {
 
     const updatedGroups = [...groups, { id: Date.now(), name: newGroupName.trim() }];
     setGroups(updatedGroups);
+    localStorage.setItem('groups', JSON.stringify(updatedGroups));
     setNewGroupName('');
   };
 
   const handleDeleteGroup = (id) => {
     const updatedGroups = groups.filter(group => group.id !== id);
     setGroups(updatedGroups);
+    localStorage.setItem('groups', JSON.stringify(updatedGroups));
   };
 
   return (

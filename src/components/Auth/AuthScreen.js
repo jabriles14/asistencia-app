@@ -56,12 +56,19 @@ const AuthScreen = ({ onLogin }) => {
       return;
     }
 
-    // Para colaboradores: el código ahora solo sirve para identificar, no restringe el acceso
+    // Validación para colaboradores (ahora solo por código)
     if (role === 'employee') {
-      // No se valida si el código existe en la base de datos aquí.
-      // Simplemente se usa el código como identificador para el registro.
-      // La búsqueda del colaborador por su nombre se hará en el panel de admin.
-      onLogin(identifier, { role: 'employee' }); // Pasa el código como identificador
+      const collaborators = JSON.parse(localStorage.getItem('employees') || '[]');
+      const foundCollaborator = collaborators.find(collab => collab.code === identifier); // Busca por código
+
+      if (foundCollaborator) {
+        // Si el código es válido, guarda el email interno del colaborador en localStorage
+        // para que la aplicación lo reconozca en futuras sesiones.
+        localStorage.setItem('currentCollaboratorEmail', foundCollaborator.email);
+        onLogin(foundCollaborator.email, { role: 'employee' }); // Pasa el email interno del colaborador encontrado
+      } else {
+        setError('Código de colaborador no válido.');
+      }
       return;
     }
   };
