@@ -2,13 +2,32 @@ import React, { useState, useEffect } from 'react';
 import AuthScreen from './components/Auth/AuthScreen';
 import EmployeeRegisterForm from './components/Employee/EmployeeRegisterForm';
 import AdminPanel from './components/Admin/AdminPanel';
+import { initialEmployees } from './mock/employees'; // Importar la lista inicial de empleados
 
 const App = () => {
   const [currentView, setCurrentView] = useState('auth');
   const [userData, setUserData] = useState(null); // userData ahora incluye el rol específico (admin_full, admin_reports)
 
-  // Nuevo useEffect para verificar si hay un colaborador logueado en localStorage
+  // useEffect para inicializar colaboradores y grupos en localStorage si no existen
   useEffect(() => {
+    // Inicializar colaboradores
+    const savedCollaborators = JSON.parse(localStorage.getItem('employees') || '[]');
+    if (savedCollaborators.length === 0) {
+      localStorage.setItem('employees', JSON.stringify(initialEmployees));
+    }
+
+    // Inicializar grupos (opcional, si quieres grupos por defecto)
+    const savedGroups = JSON.parse(localStorage.getItem('groups') || '[]');
+    if (savedGroups.length === 0) {
+      // Puedes definir algunos grupos iniciales aquí si quieres
+      const defaultGroups = [
+        { id: 1, name: "Grupo A" },
+        { id: 2, name: "Grupo B" }
+      ];
+      localStorage.setItem('groups', JSON.stringify(defaultGroups));
+    }
+
+    // Verificar si hay un colaborador logueado en localStorage
     const storedCollaboratorEmail = localStorage.getItem('currentCollaboratorEmail');
     if (storedCollaboratorEmail) {
       // Si hay un email guardado, asume que es un colaborador y lo loguea automáticamente
